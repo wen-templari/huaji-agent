@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "jobId": "019a8f15-8b9c-7abc-8def-0123456789ab",
+  "conversationId": "huajibot:main:123:456:message-789",
+  "destination": {
+    "bridgeInstance": "main",
+    "robotId": "123",
+    "groupId": "456",
+    "replyToMessageId": "message-789"
+  },
+  "content": {
+    "format": "markdown",
+    "text": "Agent response"
+  },
+  "createdAt": "2026-09-27T12:00:05Z"
+}

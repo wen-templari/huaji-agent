@@ -1,0 +1,9 @@
+{
+  "description": "Public interoperability vector; never use this secret outside tests.",
+  "secretUtf8": "huajibot-contract-test-secret",
+  "timestamp": "1790500800",
+  "bodyFile": "../examples/ingress.json",
+  "signedMessageFormat": "<timestamp>.<raw-body-utf8>",
+  "signatureHeaderPrefix": "v1=",
+  "expectedSignatureHex": "3e73118b8c8dc86b2cd1533978338de4e7073dc2bd525f07a034d5d87267c731"
+}

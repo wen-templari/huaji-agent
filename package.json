@@ -1,0 +1,47 @@
+{
+  "name": "huaji-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "deploy": "vp build && wrangler deploy",
+    "deploy:dry-run": "vp build && wrangler deploy --dry-run",
+    "contracts:generate": "node scripts/generate-contract-schemas.ts && vp fmt contracts/v1/ingress.schema.json contracts/v1/reply-job.schema.json",
+    "types": "wrangler types",
+    "lint": "vp lint",
+    "format": "vp fmt",
+    "format:check": "vp fmt --check",
+    "test": "vp test run",
+    "check": "npm run types && vp check && vp test run && vp build"
+  },
+  "dependencies": {
+    "@flue/runtime": "^2.1.1",
+    "hono": "^4.13.9",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.60.2",
+    "@flue/cli": "^2.1.1",
+    "@flue/vite": "^2.1.1",
+    "@types/node": "^24.10.0",
+    "typescript": "^7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.0.0-rc.1",
+    "vite-plus": "1.0.0-rc.1",
+    "wrangler": "^4.141.0"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.0.0-rc.1"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": "11.19.0",
+      "onFail": "download"
+    }
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  }
+}

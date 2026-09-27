@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "eventId": "main:123:456:message-789",
+  "conversationId": "huajibot:main:123:456:message-789",
+  "destination": {
+    "bridgeInstance": "main",
+    "robotId": "123",
+    "groupId": "456"
+  },
+  "message": {
+    "messageId": "message-789",
+    "senderId": "user-1",
+    "senderName": "Alice",
+    "text": "Question"
+  },
+  "replyTo": null,
+  "occurredAt": "2026-09-27T12:00:00Z"
+}
