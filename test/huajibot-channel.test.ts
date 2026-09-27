@@ -1,13 +1,17 @@
 import { createHmac } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { AgentDispatchRequest, DispatchReceipt } from '@flue/runtime';
+import {
+  type AgentDispatchRequest,
+  createChannelRouter,
+  type DispatchReceipt,
+} from '@flue/runtime';
 import { describe, expect, it, vi } from 'vite-plus/test';
 import {
   createHuajiBotChannel,
   type HuajiBotBindings,
   type SafeChannelError,
-} from '../src/channels/huajibot.ts';
+} from '../src/integrations/huajibot/channel.ts';
 import type { IngressEventV1 } from '../src/contracts/v1.ts';
 
 const signingSecret = 'test-only-signing-secret';
@@ -41,11 +45,12 @@ function receipt(deduplicated = false): DispatchReceipt {
 }
 
 function post(
-  app: ReturnType<typeof createHuajiBotChannel>,
+  channel: ReturnType<typeof createHuajiBotChannel>,
   body: string,
   env: HuajiBotBindings,
   overrides: { signature?: string; timestamp?: string } = {},
 ) {
+  const app = createChannelRouter(channel.routes);
   const requestTimestamp = overrides.timestamp ?? timestamp;
   return app.request(
     '/events',
@@ -212,5 +217,17 @@ describe('HuaJiBot channel', () => {
     expect(serializedLogs).not.toContain(signingSecret);
     expect(serializedLogs).not.toContain(requestSignature);
     expect(serializedLogs).not.toContain(event.message.text);
+  });
+
+  it('uses Flue channel routing semantics for unsupported methods', async () => {
+    const event = await exampleEvent();
+    const channel = createHuajiBotChannel({ dispatchEvent: async () => receipt() });
+    const app = createChannelRouter(channel.routes);
+
+    const response = await app.request('/events', { method: 'GET' }, bindingsFor(event));
+
+    expect(response.status).toBe(405);
+    expect(response.headers.get('allow')).toBe('POST');
+    expect(await response.json()).toMatchObject({ error: { type: 'method_not_allowed' } });
   });
 });

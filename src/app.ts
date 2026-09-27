@@ -1,8 +1,8 @@
-import { dispatch } from '@flue/runtime';
+import { createChannelRouter, dispatch } from '@flue/runtime';
 import { createAgentRouter } from '@flue/runtime/routing';
 import { Hono } from 'hono';
 import { Huaji } from './agents/huaji.ts';
-import { createHuajiBotChannel, type HuajiBotBindings } from './channels/huajibot.ts';
+import { createHuajiBotChannel, type HuajiBotBindings } from './integrations/huajibot/channel.ts';
 
 const app = new Hono<{ Bindings: HuajiBotBindings }>();
 
@@ -17,9 +17,11 @@ if (import.meta.env.DEV) {
 }
 app.route(
   '/channels/huajibot',
-  createHuajiBotChannel({
-    dispatchEvent: (request) => dispatch(Huaji, request),
-  }),
+  createChannelRouter(
+    createHuajiBotChannel({
+      dispatchEvent: (request) => dispatch(Huaji, request),
+    }).routes,
+  ),
 );
 
 export default app;

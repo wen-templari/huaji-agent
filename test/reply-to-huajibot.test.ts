@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 import { replyJobV1Schema } from '../src/contracts/v1.ts';
-import { publishReplyToHuajiBot, type TextQueue } from '../src/tools/reply-to-huajibot.ts';
+import { publishReplyToHuajiBot, type TextQueue } from '../src/integrations/huajibot/client.ts';
 
 describe('reply_to_huajibot Queue production', () => {
   it('publishes validated text jobs to the trusted current destination', async () => {

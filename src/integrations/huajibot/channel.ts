@@ -1,23 +1,21 @@
 import {
   type AgentDispatchRequest,
+  type ChannelRouteDefinition,
   type DispatchReceipt,
   SubmissionConflictError,
 } from '@flue/runtime';
-import { Hono } from 'hono';
+import type { Handler } from 'hono';
 import { z } from 'zod';
-import { destinationV1Schema, ingressEventV1Schema } from '../contracts/v1.ts';
+import { destinationV1Schema, ingressEventV1Schema } from '../../contracts/v1.ts';
+import type { HuajiBotBindings } from './bindings.ts';
+
+export type { HuajiBotBindings } from './bindings.ts';
 
 const SIGNATURE_PATTERN = /^v1=([0-9a-f]{64})$/;
 const TIMESTAMP_PATTERN = /^(0|[1-9][0-9]{0,15})$/;
 const DEFAULT_FRESHNESS_SECONDS = 5 * 60;
 const MAX_INGRESS_BYTES = 128 * 1024;
 const allowedDestinationsSchema = z.array(destinationV1Schema).min(1);
-
-export interface HuajiBotBindings {
-  HUAJIBOT_ALLOWED_DESTINATIONS: string;
-  HUAJIBOT_OUTBOUND: Queue<string>;
-  HUAJIBOT_SIGNING_SECRET: string;
-}
 
 export interface SafeChannelError {
   event: 'huajibot.dispatch_failed';
@@ -85,12 +83,12 @@ function isAllowedDestination(
 }
 
 export function createHuajiBotChannel(options: ChannelOptions) {
-  const channel = new Hono<{ Bindings: HuajiBotBindings }>();
   const freshnessSeconds = options.freshnessSeconds ?? DEFAULT_FRESHNESS_SECONDS;
   const now = options.now ?? Date.now;
   const logError = options.logError ?? ((entry) => console.error(entry));
 
-  channel.post('/events', async (context) => {
+  // Path: /channels/huajibot/events
+  const events: Handler<{ Bindings: HuajiBotBindings }> = async (context) => {
     const mediaType = context.req.header('content-type')?.split(';', 1)[0]?.trim().toLowerCase();
     if (mediaType !== 'application/json') return errorResponse('unsupported_media_type', 415);
 
@@ -178,7 +176,15 @@ export function createHuajiBotChannel(options: ChannelOptions) {
       logError({ event: 'huajibot.dispatch_failed', eventId: event.eventId });
       return errorResponse('dispatch_unavailable', 503);
     }
-  });
+  };
 
-  return channel;
+  return {
+    routes: [
+      {
+        method: 'POST',
+        path: '/events',
+        handler: events,
+      },
+    ] satisfies readonly ChannelRouteDefinition<{ Bindings: HuajiBotBindings }>[],
+  } as const;
 }
