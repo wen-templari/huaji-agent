@@ -16,7 +16,16 @@
     ],
   },
   "secrets": {
-    "required": ["HUAJIBOT_SIGNING_SECRET", "HUAJIBOT_ALLOWED_DESTINATIONS"],
+    "required": [
+      "HUAJI_MODEL_BASE_URL",
+      "HUAJI_MODEL_API_KEY",
+      "HUAJI_MODEL_ID",
+      "HUAJI_MODEL_API",
+      "HUAJI_MODEL_CONTEXT_WINDOW",
+      "HUAJI_MODEL_MAX_OUTPUT_TOKENS",
+      "HUAJIBOT_SIGNING_SECRET",
+      "HUAJIBOT_ALLOWED_DESTINATIONS",
+    ],
   },
   "migrations": [
     {
@@ -28,7 +37,16 @@
     "development": {
       "name": "huaji-agent-development",
       "secrets": {
-        "required": ["HUAJIBOT_SIGNING_SECRET", "HUAJIBOT_ALLOWED_DESTINATIONS"],
+        "required": [
+          "HUAJI_MODEL_BASE_URL",
+          "HUAJI_MODEL_API_KEY",
+          "HUAJI_MODEL_ID",
+          "HUAJI_MODEL_API",
+          "HUAJI_MODEL_CONTEXT_WINDOW",
+          "HUAJI_MODEL_MAX_OUTPUT_TOKENS",
+          "HUAJIBOT_SIGNING_SECRET",
+          "HUAJIBOT_ALLOWED_DESTINATIONS",
+        ],
       },
       "queues": {
         "producers": [

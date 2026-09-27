@@ -21,6 +21,7 @@
     "check": "npm run types && vp check && vp test run && vp build"
   },
   "dependencies": {
+    "@earendil-works/pi-ai": "^0.83.0",
     "@flue/runtime": "^2.1.1",
     "hono": "^4.13.9",
     "valibot": "^1.5.0",

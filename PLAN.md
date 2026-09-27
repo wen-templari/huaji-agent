@@ -16,38 +16,50 @@ QQ / Telegram / Satori
           |
           | versioned reply job
           v
-  Cloudflare Queue + DLQ
-          ^
-          | HTTP pull + ack
-          |
-    HuaJiBot.NET
+      reply sink
+       /       \
+ development   production
+      |             |
+      v             v
+captured mock  Cloudflare Queue + DLQ
+                    ^
+                    | HTTP pull + ack
+                    |
+              HuaJiBot.NET
 ```
 
 ServerlessMQ is not part of the durable reply path. It may later provide a best-effort wake-up notification, while Cloudflare Queue remains the source of truth.
+
+The development sink is only a vertical-slice aid. It runs behind the same
+`reply_to_huajibot({ text })` tool and validates the same reply-job contract, but captures
+the job for inspection instead of delivering it. It is never enabled in production.
 
 ## Implementation steps
 
 - [x] 1. Define versioned ingress and reply-job contracts, examples, limits, identifier rules, and HMAC test vectors.
 - [x] 2. Scaffold the TypeScript, Vite, Flue, and Cloudflare Worker project with tests, linting, Wrangler configuration, and the initial Durable Object migration.
 - [x] 3a. Configure separate development and production outbound Queue bindings and document provisioning and secret handling.
-- [ ] 3b. Provision the outbound Queues, dead-letter queues, HTTP pull consumers, and scoped credentials in the Cloudflare account.
 - [x] 4. Implement the custom HuaJiBot Flue channel with HMAC verification, replay protection, tuple allowlists, and idempotent dispatch.
 - [x] 5. Implement the agent and its narrow `reply_to_huajibot({ text })` Queue-producing tool.
-- [ ] 6. Add `HuaJiBot.NET.Plugin.FlueBridge` to HuaJiBot.NET.
-- [ ] 7. Add the SQLite message/conversation map and delivery ledger.
-- [ ] 8. Route configured mentions and reply threads into versioned ingress events.
-- [ ] 9. Add exact-body signing, bounded HTTP retries, and safe structured logging.
-- [ ] 10. Implement Queue pull, validation, delivery, deduplication, acknowledgment, retry, and backoff.
-- [ ] 11. Add cross-repository contract tests and failure-path integration tests.
-- [ ] 12. Deploy one canary group and validate outage recovery, duplicate handling, and observability.
-- [ ] 13. Roll out group by group, then disable the old AIChat plugin for migrated groups.
+- [ ] 6. Deliver a runnable development vertical slice: configure the selected OpenAI-compatible endpoint, model metadata, and API-key secret; put the production Queue and a development-only captured sink behind one reply-publisher interface; and add a smoke path for signed ingress -> durable agent -> model -> real reply tool -> validated captured reply job. No Workers AI binding is required.
+- [ ] 7. Add `HuaJiBot.NET.Plugin.FlueBridge` to HuaJiBot.NET with transport boundaries that can be tested without Cloudflare.
+- [ ] 8. Add the SQLite message/conversation map and delivery ledger.
+- [ ] 9. Route configured mentions and reply threads into versioned ingress events.
+- [ ] 10. Add exact-body signing, bounded HTTP retries, and safe structured logging.
+- [ ] 11. Provision the outbound Queues, dead-letter queues, HTTP pull consumers, and scoped credentials in the Cloudflare account.
+- [ ] 12. Implement Queue pull, validation, delivery, deduplication, acknowledgment, retry, and backoff.
+- [ ] 13. Add cross-repository contract tests and failure-path integration tests.
+- [ ] 14. Deploy one canary group and validate outage recovery, duplicate handling, and observability.
+- [ ] 15. Roll out group by group, then disable the old AIChat plugin for migrated groups.
 
 ## Delivery slices
 
 1. Contracts and Worker scaffold.
 2. Flue channel and agent reply tool.
-3. HuaJiBot.NET ingress and local storage.
-4. Queue consumption, recovery tests, and canary rollout.
+3. Runnable agent with a captured development reply sink.
+4. HuaJiBot.NET ingress and local storage.
+5. Production Queue provisioning and consumption.
+6. Recovery tests and canary rollout.
 
 ## Version-one boundaries
 

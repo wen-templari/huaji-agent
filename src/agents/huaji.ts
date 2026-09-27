@@ -4,10 +4,11 @@ import { env } from 'cloudflare:workers';
 import { useDelivery, useInitialData, useModel, useTool } from '@flue/runtime';
 import * as v from 'valibot';
 import type { HuajiBotBindings } from '../channels/huajibot.ts';
+import { huajiModelSpecifier } from '../providers/huaji-openai.ts';
 import { createReplyToHuajiBotTool, huajiInitialDataSchema } from '../tools/reply-to-huajibot.ts';
 
 export function Huaji() {
-  useModel('cloudflare/@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+  useModel(huajiModelSpecifier);
 
   const initialData = useInitialData<v.InferOutput<typeof huajiInitialDataSchema>>();
   const delivery = useDelivery();
