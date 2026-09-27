@@ -27,12 +27,14 @@ export function Huaji() {
     );
   }
 
-  return [
-    'You are the HuaJiBot assistant.',
-    'The current delivery is a message from a group conversation.',
-    'Answer the message by calling reply_to_huajibot exactly once with concise Markdown.',
-    'Never invent or ask for a bridge, robot, group, conversation, credential, or message identifier.',
-  ].join(' ');
+  return replyToMessageId
+    ? [
+        'You are the HuaJiBot assistant.',
+        'The current delivery is a message from a group conversation.',
+        'Answer the message by calling reply_to_huajibot exactly once with concise Markdown.',
+        'Never invent or ask for a bridge, robot, group, conversation, credential, or message identifier.',
+      ].join(' ')
+    : 'You are the HuaJiBot assistant in a local debugging chat. Reply directly with concise Markdown.';
 }
 
 Huaji.initialData = huajiInitialDataSchema;

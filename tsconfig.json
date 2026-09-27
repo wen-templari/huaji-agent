@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2023",
-    "lib": ["ES2023", "WebWorker"],
+    "lib": ["ES2023", "WebWorker", "DOM"],
+    "types": ["vite/client"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "strict": true,
@@ -14,5 +16,5 @@
     "noUnusedParameters": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts", "*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "test/**/*.ts", "*.ts"]
 }
