@@ -60,4 +60,25 @@ describe('version-one contracts', () => {
       'huajibot:main:default:-100123%3A42:message%2F789',
     );
   });
+
+  it('limits event IDs to Flue idempotency-key length', () => {
+    const event = ingressEventV1Schema.parse({
+      version: 1,
+      eventId: 'a'.repeat(256),
+      conversationId: 'huajibot:main:default:group:message',
+      destination: { bridgeInstance: 'main', robotId: null, groupId: 'group' },
+      message: {
+        messageId: 'message',
+        senderId: 'sender',
+        senderName: 'Sender',
+        text: 'Hello',
+      },
+      occurredAt: '2026-09-27T12:00:00Z',
+    });
+
+    expect(event.eventId).toHaveLength(256);
+    expect(ingressEventV1Schema.safeParse({ ...event, eventId: 'a'.repeat(257) }).success).toBe(
+      false,
+    );
+  });
 });

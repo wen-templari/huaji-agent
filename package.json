@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev",
+    "dev:development": "CLOUDFLARE_ENV=development vp dev",
     "build": "vp build",
+    "build:development": "CLOUDFLARE_ENV=development vp build",
     "deploy": "vp build && wrangler deploy",
+    "deploy:development": "CLOUDFLARE_ENV=development npm run deploy",
     "deploy:dry-run": "vp build && wrangler deploy --dry-run",
+    "deploy:development:dry-run": "CLOUDFLARE_ENV=development npm run deploy:dry-run",
     "contracts:generate": "node scripts/generate-contract-schemas.ts && vp fmt contracts/v1/ingress.schema.json contracts/v1/reply-job.schema.json",
     "types": "wrangler types",
     "lint": "vp lint",
@@ -19,6 +23,7 @@
   "dependencies": {
     "@flue/runtime": "^2.1.1",
     "hono": "^4.13.9",
+    "valibot": "^1.5.0",
     "zod": "4.6.5"
   },
   "devDependencies": {

@@ -9,7 +9,9 @@
       "const": 1
     },
     "eventId": {
-      "$ref": "#/$defs/__schema0"
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
     },
     "conversationId": {
       "type": "string",

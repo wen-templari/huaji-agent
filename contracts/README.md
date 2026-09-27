@@ -34,6 +34,9 @@ Recommended event IDs are similarly stable and deterministic:
 <encoded-bridge>:<encoded-robot-or-default>:<encoded-group>:<encoded-message>
 ```
 
+An `eventId` is limited to 256 characters because it is passed unchanged as Flue's
+`idempotencyKey`. Other opaque identifiers retain the version-one 512-character limit.
+
 ## Reply jobs
 
 The Worker publishes the serialized reply job as Cloudflare Queue `text` content containing JSON. HuaJiBot.NET validates the job before delivery, deduplicates it by `jobId`, sends it through the selected adapter, records all returned message IDs, and only then acknowledges the Queue lease.

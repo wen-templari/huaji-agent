@@ -1,13 +1,37 @@
 'use agent';
 
-import { useModel } from '@flue/runtime';
+import { env } from 'cloudflare:workers';
+import { useDelivery, useInitialData, useModel, useTool } from '@flue/runtime';
+import * as v from 'valibot';
+import type { HuajiBotBindings } from '../channels/huajibot.ts';
+import { createReplyToHuajiBotTool, huajiInitialDataSchema } from '../tools/reply-to-huajibot.ts';
 
 export function Huaji() {
   useModel('cloudflare/@cf/meta/llama-3.3-70b-instruct-fp8-fast');
 
+  const initialData = useInitialData<v.InferOutput<typeof huajiInitialDataSchema>>();
+  const delivery = useDelivery();
+  const replyToMessageId = delivery.kind === 'signal' ? delivery.attributes?.messageId : undefined;
+
+  if (replyToMessageId) {
+    const bindings = env as unknown as HuajiBotBindings;
+    useTool(
+      createReplyToHuajiBotTool(
+        {
+          ...initialData,
+          replyToMessageId,
+        },
+        bindings.HUAJIBOT_OUTBOUND,
+      ),
+    );
+  }
+
   return [
     'You are the HuaJiBot assistant.',
-    'The production prompt and reply tool will be added after the bridge channel contract is implemented.',
-    'Keep responses concise during scaffold verification.',
+    'The current delivery is a message from a group conversation.',
+    'Answer the message by calling reply_to_huajibot exactly once with concise Markdown.',
+    'Never invent or ask for a bridge, robot, group, conversation, credential, or message identifier.',
   ].join(' ');
 }
+
+Huaji.initialData = huajiInitialDataSchema;

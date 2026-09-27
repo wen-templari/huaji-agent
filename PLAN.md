@@ -29,9 +29,10 @@ ServerlessMQ is not part of the durable reply path. It may later provide a best-
 
 - [x] 1. Define versioned ingress and reply-job contracts, examples, limits, identifier rules, and HMAC test vectors.
 - [x] 2. Scaffold the TypeScript, Vite, Flue, and Cloudflare Worker project with tests, linting, Wrangler configuration, and the initial Durable Object migration.
-- [ ] 3. Provision the outbound Queue, dead-letter queue, HTTP pull access, bindings, and scoped secrets.
-- [ ] 4. Implement the custom HuaJiBot Flue channel with HMAC verification, replay protection, allowlists, and idempotent dispatch.
-- [ ] 5. Implement the agent and its narrow `reply_to_huajibot({ text })` Queue-producing tool.
+- [x] 3a. Configure separate development and production outbound Queue bindings and document provisioning and secret handling.
+- [ ] 3b. Provision the outbound Queues, dead-letter queues, HTTP pull consumers, and scoped credentials in the Cloudflare account.
+- [x] 4. Implement the custom HuaJiBot Flue channel with HMAC verification, replay protection, tuple allowlists, and idempotent dispatch.
+- [x] 5. Implement the agent and its narrow `reply_to_huajibot({ text })` Queue-producing tool.
 - [ ] 6. Add `HuaJiBot.NET.Plugin.FlueBridge` to HuaJiBot.NET.
 - [ ] 7. Add the SQLite message/conversation map and delivery ledger.
 - [ ] 8. Route configured mentions and reply threads into versioned ingress events.

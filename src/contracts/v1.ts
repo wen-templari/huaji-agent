@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const CONTRACT_VERSION = 1 as const;
 
 const identifierV1Schema = z.string().min(1).max(512);
+const eventIdV1Schema = z.string().min(1).max(256);
 const nullableIdentifierV1Schema = identifierV1Schema.nullable();
 const conversationIdV1Schema = z
   .string()
@@ -32,7 +33,7 @@ export const replyContextV1Schema = z.strictObject({
 
 export const ingressEventV1Schema = z.strictObject({
   version: z.literal(CONTRACT_VERSION),
-  eventId: identifierV1Schema,
+  eventId: eventIdV1Schema,
   conversationId: conversationIdV1Schema,
   destination: destinationV1Schema,
   message: ingressMessageV1Schema,
