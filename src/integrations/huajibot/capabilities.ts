@@ -2,6 +2,7 @@ import type { DeliveredMessage, ToolDefinition } from '@flue/runtime';
 import * as v from 'valibot';
 import type { HuajiBotBindings } from './bindings.ts';
 import { createHuajiBotClient } from './client.ts';
+import { createReplyPublisher } from './publishers.ts';
 import { createReplyToHuajiBotTool } from './tools.ts';
 
 export const huajiInitialDataSchema = v.strictObject({
@@ -33,7 +34,7 @@ export function createHuajiBotAgentCapabilities(
     };
   }
 
-  const client = createHuajiBotClient(bindings.HUAJIBOT_OUTBOUND);
+  const client = createHuajiBotClient(createReplyPublisher(bindings));
   return {
     instructions: [
       'You are the HuaJiBot assistant.',

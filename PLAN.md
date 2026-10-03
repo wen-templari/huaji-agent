@@ -16,23 +16,22 @@ QQ / Telegram / Satori
           |
           | versioned reply job
           v
-      reply sink
-       /       \
- development   production
-      |             |
-      v             v
-captured mock  Cloudflare Queue + DLQ
-                    ^
-                    | HTTP pull + ack
-                    |
-              HuaJiBot.NET
+   reply publisher
+      /         \
+development   production adapter
+     |          (transport pending)
+     v
+durable capture
 ```
 
-ServerlessMQ is not part of the durable reply path. It may later provide a best-effort wake-up notification, while Cloudflare Queue remains the source of truth.
+The production transport is intentionally isolated behind the reply-publisher boundary.
+The existing Cloudflare Queue adapter remains available while acknowledged, persistent
+ServerlessMQ delivery is designed.
 
 The development sink is only a vertical-slice aid. It runs behind the same
-`reply_to_huajibot({ text })` tool and validates the same reply-job contract, but captures
-the job for inspection instead of delivering it. It is never enabled in production.
+`reply_to_huajibot({ text })` tool and validates the same reply-job contract, but durably
+captures the job for inspection instead of delivering it. It is never selected in
+production.
 
 ## Implementation steps
 
@@ -41,7 +40,7 @@ the job for inspection instead of delivering it. It is never enabled in producti
 - [x] 3a. Configure separate development and production outbound Queue bindings and document provisioning and secret handling.
 - [x] 4. Implement the custom HuaJiBot Flue channel with HMAC verification, replay protection, tuple allowlists, and idempotent dispatch.
 - [x] 5. Implement the agent and its narrow `reply_to_huajibot({ text })` Queue-producing tool.
-- [ ] 6. Deliver a runnable development vertical slice: configure the selected OpenAI-compatible endpoint, model metadata, and API-key secret; put the production Queue and a development-only captured sink behind one reply-publisher interface; and add a smoke path for signed ingress -> durable agent -> model -> real reply tool -> validated captured reply job. No Workers AI binding is required.
+- [x] 6. Deliver a runnable development vertical slice: configure the selected OpenAI-compatible endpoint, model metadata, and API-key secret; put production delivery and a development-only durable captured sink behind one reply-publisher interface; and add a smoke path for signed ingress -> durable agent -> model -> real reply tool -> validated captured reply job. No Workers AI binding is required.
 - [ ] 7. Add `HuaJiBot.NET.Plugin.FlueBridge` to HuaJiBot.NET with transport boundaries that can be tested without Cloudflare.
 - [ ] 8. Add the SQLite message/conversation map and delivery ledger.
 - [ ] 9. Route configured mentions and reply threads into versioned ingress events.
@@ -65,7 +64,7 @@ the job for inspection instead of delivering it. It is never enabled in producti
 
 - Only group mentions and replies within an established bot thread are forwarded.
 - The model never selects a bridge, robot, group, adapter, credential, or provider API.
-- One outbound Queue is used per HuaJiBot deployment.
-- Queue delivery is at least once; `jobId` is the deduplication key.
+- One durable production reply subscription is used per HuaJiBot deployment.
+- Production delivery is at least once; `jobId` is the deduplication key.
 - The unavoidable send-success/crash-before-ledger-write window is documented rather than hidden.
-- Interactive access to internal HuaJiBot tools, Cloudflare Tunnel, and ServerlessMQ wake-ups are deferred.
+- Interactive access to internal HuaJiBot tools and Cloudflare Tunnel is deferred.

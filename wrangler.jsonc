@@ -7,6 +7,17 @@
     "enabled": true,
     "head_sampling_rate": 1,
   },
+  "vars": {
+    "HUAJIBOT_REPLY_TRANSPORT": "queue",
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "HUAJIBOT_REPLY_CAPTURES",
+        "class_name": "HuajiBotReplyCapture",
+      },
+    ],
+  },
   "queues": {
     "producers": [
       {
@@ -32,10 +43,25 @@
       "tag": "flue-class-FlueHuajiAgent",
       "new_sqlite_classes": ["FlueHuajiAgent"],
     },
+    {
+      "tag": "huajibot-development-reply-capture",
+      "new_sqlite_classes": ["HuajiBotReplyCapture"],
+    },
   ],
   "env": {
     "development": {
       "name": "huaji-agent-development",
+      "vars": {
+        "HUAJIBOT_REPLY_TRANSPORT": "capture",
+      },
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "HUAJIBOT_REPLY_CAPTURES",
+            "class_name": "HuajiBotReplyCapture",
+          },
+        ],
+      },
       "secrets": {
         "required": [
           "HUAJI_MODEL_BASE_URL",

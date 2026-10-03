@@ -31,6 +31,8 @@ function bindingsFor(event: IngressEventV1): HuajiBotBindings {
   return {
     HUAJIBOT_ALLOWED_DESTINATIONS: JSON.stringify([event.destination]),
     HUAJIBOT_OUTBOUND: { send: vi.fn() } as unknown as Queue<string>,
+    HUAJIBOT_REPLY_CAPTURES: {} as HuajiBotBindings['HUAJIBOT_REPLY_CAPTURES'],
+    HUAJIBOT_REPLY_TRANSPORT: 'queue',
     HUAJIBOT_SIGNING_SECRET: signingSecret,
   };
 }

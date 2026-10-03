@@ -7,8 +7,6 @@ export interface HuajiBotReplyReference {
   replyToMessageId: string;
 }
 
-export type TextQueue = Pick<Queue<string>, 'send'>;
-
 interface ReplyDependencies {
   now?: () => Date;
   randomUUID?: () => `${string}-${string}-${string}-${string}-${string}`;
@@ -18,13 +16,16 @@ export interface HuajiBotClient {
   reply(context: HuajiBotReplyReference, text: string): Promise<ReplyJobV1>;
 }
 
-export async function publishReplyToHuajiBot(
+export interface ReplyPublisher {
+  publish(job: ReplyJobV1): Promise<void>;
+}
+
+export function createReplyJob(
   context: HuajiBotReplyReference,
   text: string,
-  queue: TextQueue,
   dependencies: ReplyDependencies = {},
-): Promise<ReplyJobV1> {
-  const job = replyJobV1Schema.parse({
+): ReplyJobV1 {
+  return replyJobV1Schema.parse({
     version: 1,
     jobId: (dependencies.randomUUID ?? (() => crypto.randomUUID()))(),
     conversationId: context.conversationId,
@@ -35,16 +36,24 @@ export async function publishReplyToHuajiBot(
     content: { format: 'markdown', text },
     createdAt: (dependencies.now ?? (() => new Date()))().toISOString(),
   });
+}
 
-  await queue.send(JSON.stringify(job), { contentType: 'text' });
+export async function publishReplyToHuajiBot(
+  context: HuajiBotReplyReference,
+  text: string,
+  publisher: ReplyPublisher,
+  dependencies: ReplyDependencies = {},
+): Promise<ReplyJobV1> {
+  const job = createReplyJob(context, text, dependencies);
+  await publisher.publish(job);
   return job;
 }
 
 export function createHuajiBotClient(
-  queue: TextQueue,
+  publisher: ReplyPublisher,
   dependencies: ReplyDependencies = {},
 ): HuajiBotClient {
   return {
-    reply: (context, text) => publishReplyToHuajiBot(context, text, queue, dependencies),
+    reply: (context, text) => publishReplyToHuajiBot(context, text, publisher, dependencies),
   };
 }

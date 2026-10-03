@@ -7,6 +7,7 @@
     "dev": "vp dev --host 127.0.0.1 --port 5173 --strictPort",
     "dev:ui": "vp dev --config vite.config.ui.ts",
     "dev:development": "CLOUDFLARE_ENV=development vp dev",
+    "smoke:development": "node --env-file-if-exists=.dev.vars scripts/smoke-development.ts",
     "build": "vp build",
     "build:ui": "vp build --config vite.config.ui.ts",
     "build:development": "CLOUDFLARE_ENV=development vp build",
